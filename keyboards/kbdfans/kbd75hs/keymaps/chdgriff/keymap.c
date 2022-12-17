@@ -9,12 +9,6 @@
 #define RGB_DEFAULT_SAT         242
 #define RGB_DEFAULT_VAL         255
 
-#define BACKLIGHT_TIMEOUT 7    // in minutes
-static uint16_t idle_timer = 0;
-static uint8_t min_counter = 0;
-static bool led_on = true;
-static HSV old_hsv;
-
 enum custom_keycodes {
     SWPCTRL = SAFE_RANGE,
 };
@@ -72,13 +66,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             //     SEND_STRING("");
             //     break;
         }
-        if (led_on == false) {
-		    rgblight_enable_noeeprom();
-            rgblight_sethsv_noeeprom(old_hsv.h, old_hsv.s, old_hsv.v);
-            led_on = true;
-            }
-        idle_timer = timer_read();
-        min_counter = 0;
     }
     return true;
 };
@@ -115,20 +102,3 @@ layer_state_t default_layer_state_set_user(layer_state_t state) {
     }
     return state;
 }
-
-void matrix_scan_user(void) {
-  // idle_timer needs to be set one time
-    if (idle_timer == 0) idle_timer = timer_read();
-    if ( led_on && timer_elapsed(idle_timer) > 60000) {
-        min_counter++;
-        idle_timer = timer_read();
-    }
-
-    if (led_on && min_counter >= BACKLIGHT_TIMEOUT) {
-        old_hsv = rgblight_get_hsv();
-        rgblight_sethsv_noeeprom(0,0,0);
-        rgblight_disable_noeeprom();
-        led_on = false;
-        min_counter = 0;
-    }
-};
