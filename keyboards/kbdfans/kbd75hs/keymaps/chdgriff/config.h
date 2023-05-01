@@ -18,6 +18,12 @@
   #undef RGBLIGHT_LIMIT_VAL
 #endif
 
+#ifdef DEBOUNCE
+  #undef DEBOUNCE
+#endif
+
+#define DEBOUNCE 7
+
 #define RGBLIGHT_DEFAULT_MODE       (RGBLIGHT_MODE_TWINKLE + 1)
 #define RGBLIGHT_DEFAULT_HUE        163
 #define RGBLIGHT_DEFAULT_SAT        245
@@ -28,7 +34,6 @@
 #define RGBLIGHT_LAYERS
 #define RGBLIGHT_LAYERS_RETAIN_VAL
 #define USB_POLLING_INTERVAL_MS     1
-
 
 #define RGB_DISABLE_WHEN_USB_SUSPENDED 1
 #define RGBLIGHT_SLEEP  // allows us to use rgblight_suspend() and rgblight_wakeup() in keymap.c

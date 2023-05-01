@@ -1,3 +1,3 @@
 LTO_ENABLE = yes
 MOUSEKEY_ENABLE = no
-DEBOUNCE_TYPE = sym_eager_pk
+DEBOUNCE_TYPE = sym_eager_pr
