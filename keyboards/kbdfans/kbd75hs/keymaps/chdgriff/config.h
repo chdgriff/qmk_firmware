@@ -35,6 +35,6 @@
 #define RGBLIGHT_LAYERS_RETAIN_VAL
 #define USB_POLLING_INTERVAL_MS     1
 
-#define RGB_DISABLE_WHEN_USB_SUSPENDED 1
+#define RGB_DISABLE_WHEN_USB_SUSPENDED true
 #define RGBLIGHT_SLEEP  // allows us to use rgblight_suspend() and rgblight_wakeup() in keymap.c
-#define RGBLIGHT_TIMEOUT 30000  // 30 seconds
+#define RGBLIGHT_TIMEOUT 60000  // 60 seconds
