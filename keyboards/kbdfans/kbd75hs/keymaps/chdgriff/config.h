@@ -22,7 +22,7 @@
   #undef DEBOUNCE
 #endif
 
-#define DEBOUNCE 16
+#define DEBOUNCE 8
 
 #define RGBLIGHT_DEFAULT_MODE       (RGBLIGHT_MODE_TWINKLE + 1)
 #define RGBLIGHT_DEFAULT_HUE        163
