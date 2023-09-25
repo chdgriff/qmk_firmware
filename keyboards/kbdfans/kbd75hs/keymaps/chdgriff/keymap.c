@@ -1,4 +1,5 @@
 #include QMK_KEYBOARD_H
+#include "process_magic.h"
 
 #define _Base_Layer             0
 #define _Function_Layer         1
