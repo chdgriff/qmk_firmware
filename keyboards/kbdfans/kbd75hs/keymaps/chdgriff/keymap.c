@@ -31,7 +31,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
       _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,            QK_REBOOT,
       _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,            _______,            _______,
       _______,    _______,  _______,  _______,  _______,  _______,  _______,    _______,  _______,  _______,  _______,  _______,                 _______,   _______,
-      SWPCTRL,  MAGIC_TOGGLE_GUI,  _______,                                _______,                  _______,        _______,         _______,  _______,  _______,   _______
+      SWPCTRL,  QK_MAGIC_TOGGLE_CTL_GUI,  _______,                                _______,                  _______,        _______,         _______,  _______,  _______,   _______
       ),
 
   [_Mac_Function_Layer] = LAYOUT_75_ansi(KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_MRWD, KC_MPLY, KC_MFFD, KC_MUTE, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
@@ -60,8 +60,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
     case SWPCTRL:
       if (record->event.pressed) {
-        process_magic(MAGIC_TOGGLE_CTL_GUI, record);
-        process_magic(MAGIC_UNSWAP_RCTL_RGUI, record);
+        process_magic(QK_MAGIC_TOGGLE_CTL_GUI, record);
+        process_magic(QK_MAGIC_UNSWAP_RCTL_RGUI, record);
       }
       return false;
     default:
@@ -101,59 +101,59 @@ layer_state_t default_layer_state_set_user(layer_state_t state) {
   return state;
 }
 
-/* RGB Timeout behaves similar to OLED Timeout where it turns off underglow
-lighting on your QMK board after X seconds of inactivity. The logic is
-best described by this reddit comment - https://bit.ly/3zCYIRl
-To begin, add the following variables and function definitions to your keymap.c file */
+// /* RGB Timeout behaves similar to OLED Timeout where it turns off underglow
+// lighting on your QMK board after X seconds of inactivity. The logic is
+// best described by this reddit comment - https://bit.ly/3zCYIRl
+// To begin, add the following variables and function definitions to your keymap.c file */
 
-static uint16_t key_timer; // timer to track the last keyboard activity
-static void refresh_rgb(void); // refreshes the activity timer and RGB, invoke whenever activity happens
-static void check_rgb_timeout(void); // checks if enough time has passed for RGB to timeout
-bool is_rgb_timeout = false; // store if RGB has timed out or not in a boolean
-
-
-void refresh_rgb() {
-  key_timer = timer_read(); // store time of last refresh
-  if (is_rgb_timeout) { // only do something if rgb has timed out
-    print("Activity detected, removing timeout\n");
-    is_rgb_timeout = false;
-    rgblight_wakeup();
-  }
-}
-
-void check_rgb_timeout() {
-  if (!is_rgb_timeout && timer_elapsed(key_timer) > RGBLIGHT_TIMEOUT) {
-    rgblight_suspend();
-    is_rgb_timeout = true;
-  }
-}
+// static uint16_t key_timer; // timer to track the last keyboard activity
+// static void refresh_rgb(void); // refreshes the activity timer and RGB, invoke whenever activity happens
+// static void check_rgb_timeout(void); // checks if enough time has passed for RGB to timeout
+// bool is_rgb_timeout = false; // store if RGB has timed out or not in a boolean
 
 
-/* Then, call the above functions from QMK's built in post processing functions like so */
+// void refresh_rgb() {
+//   key_timer = timer_read(); // store time of last refresh
+//   if (is_rgb_timeout) { // only do something if rgb has timed out
+//     print("Activity detected, removing timeout\n");
+//     is_rgb_timeout = false;
+//     rgblight_wakeup();
+//   }
+// }
 
-/* Runs at the end of each scan loop, check if RGB timeout has occured */
-void housekeeping_task_user(void) {
-  #ifdef RGBLIGHT_TIMEOUT
-  check_rgb_timeout();
-  #endif
+// void check_rgb_timeout() {
+//   if (!is_rgb_timeout && timer_elapsed(key_timer) > RGBLIGHT_TIMEOUT) {
+//     rgblight_suspend();
+//     is_rgb_timeout = true;
+//   }
+// }
 
-  /* rest of the function code here */
-}
 
-/* Runs after each key press, check if activity occurred */
-void post_process_record_user(uint16_t keycode, keyrecord_t *record) {
-  #ifdef RGBLIGHT_TIMEOUT
-  if (record->event.pressed) refresh_rgb();
-  #endif
+// /* Then, call the above functions from QMK's built in post processing functions like so */
 
-  /* rest of the function code here */
-}
+// /* Runs at the end of each scan loop, check if RGB timeout has occured */
+// void housekeeping_task_user(void) {
+//   #ifdef RGBLIGHT_TIMEOUT
+//   check_rgb_timeout();
+//   #endif
 
-/* Runs after each encoder tick, check if activity occurred */
-void post_encoder_update_user(uint8_t index, bool clockwise) {
-  #ifdef RGBLIGHT_TIMEOUT
-  refresh_rgb();
-  #endif
+//   /* rest of the function code here */
+// }
 
-  /* rest of the function code here */
-}
+// /* Runs after each key press, check if activity occurred */
+// void post_process_record_user(uint16_t keycode, keyrecord_t *record) {
+//   #ifdef RGBLIGHT_TIMEOUT
+//   if (record->event.pressed) refresh_rgb();
+//   #endif
+
+//   /* rest of the function code here */
+// }
+
+// /* Runs after each encoder tick, check if activity occurred */
+// void post_encoder_update_user(uint8_t index, bool clockwise) {
+//   #ifdef RGBLIGHT_TIMEOUT
+//   refresh_rgb();
+//   #endif
+
+//   /* rest of the function code here */
+// }
