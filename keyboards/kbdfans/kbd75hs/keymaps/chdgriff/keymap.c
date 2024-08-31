@@ -97,8 +97,7 @@ static uint32_t idle_callback(uint32_t trigger_time, void* cb_arg) {
 }
 
 uint32_t del_bios_callback(uint32_t trigger_time, void* cb_arg) {
-  // tap_code(KC_DEL);
-  SEND_STRING("DEL");
+  tap_code(KC_DEL);
   return 100;  // Call the callback every 16 ms.
 }
 
@@ -116,6 +115,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (del_bios_token) {
       cancel_deferred_exec(del_bios_token);
       del_bios_token = INVALID_DEFERRED_TOKEN;
+      rgblight_sethsv_noeeprom(RGBLIGHT_DEFAULT_HUE, RGBLIGHT_DEFAULT_SAT, RGBLIGHT_DEFAULT_VAL);
       return true;
     }
 
@@ -125,6 +125,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         process_magic(QK_MAGIC_UNSWAP_RCTL_RGUI, record);
         break;
       case DELBIOS:
+        rgblight_sethsv_noeeprom(HSV_GREEN);
         del_bios_token = defer_exec(1, del_bios_callback, NULL);
         break;
       default:
@@ -132,4 +133,4 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     }
   }
   return true;
-};
+}
