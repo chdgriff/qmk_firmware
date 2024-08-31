@@ -57,43 +57,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                           KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO)
 };
 
-static uint32_t idle_callback(uint32_t trigger_time, void* cb_arg) {
-  // If execution reaches here, the keyboard has gone idle.
-  rgblight_suspend();
-  return 0;
-}
-
-bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-  // On every key event, start or extend the deferred execution to call
-  // `idle_callback()` after IDLE_TIMEOUT_MS.
-  static deferred_token idle_token = INVALID_DEFERRED_TOKEN;
-  if (!extend_deferred_exec(idle_token, IDLE_TIMEOUT_MS)) {
-    idle_token = defer_exec(IDLE_TIMEOUT_MS, idle_callback, NULL);
-    rgblight_wakeup();
-  }
-
-  switch (keycode) {
-    case SWPCTRL:
-      if (record->event.pressed) {
-        process_magic(QK_MAGIC_TOGGLE_CTL_GUI, record);
-        process_magic(QK_MAGIC_UNSWAP_RCTL_RGUI, record);
-      }
-      return true;
-    case RGBLIGHTSUSPEND:
-      if (record->event.pressed) {
-        rgblight_suspend();
-      }
-      return true;
-    case RGBLIGHTWAKEUP:
-      if (record->event.pressed) {
-        rgblight_wakeup();
-      }
-      return true;
-    default:
-      return true;
-  }
-};
-
 const rgblight_segment_t PROGMEM capslock_light_layer[] = RGBLIGHT_LAYER_SEGMENTS(
   {1, 3, HSV_RED},       // Light 4 LEDs, starting with LED 6
   {6, 4, HSV_RED}       // Light 4 LEDs, starting with LED 12
@@ -125,3 +88,30 @@ layer_state_t default_layer_state_set_user(layer_state_t state) {
   }
   return state;
 }
+
+static uint32_t idle_callback(uint32_t trigger_time, void* cb_arg) {
+  // If execution reaches here, the keyboard has gone idle.
+  rgblight_suspend();
+  return 0;
+}
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  // On every key event, start or extend the deferred execution to call
+  // `idle_callback()` after IDLE_TIMEOUT_MS.
+  static deferred_token idle_token = INVALID_DEFERRED_TOKEN;
+  if (!extend_deferred_exec(idle_token, IDLE_TIMEOUT_MS)) {
+    idle_token = defer_exec(IDLE_TIMEOUT_MS, idle_callback, NULL);
+    rgblight_wakeup();
+  }
+
+  switch (keycode) {
+    case SWPCTRL:
+      if (record->event.pressed) {
+        process_magic(QK_MAGIC_TOGGLE_CTL_GUI, record);
+        process_magic(QK_MAGIC_UNSWAP_RCTL_RGUI, record);
+      }
+      return true;
+    default:
+      return true;
+  }
+};
