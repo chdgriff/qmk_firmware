@@ -111,24 +111,25 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     rgblight_wakeup();
   }
 
+  static deferred_token del_bios_token = INVALID_DEFERRED_TOKEN;
   if (record->event.pressed) {
-    static deferred_token del_bios_token = INVALID_DEFERRED_TOKEN;
     if (del_bios_token) {
       cancel_deferred_exec(del_bios_token);
       del_bios_token = INVALID_DEFERRED_TOKEN;
-    } else if (keycode == DELBIOS) {
-      del_bios_token = defer_exec(1, del_bios_callback, NULL);
+      return true;
     }
-  }
 
-  switch (keycode) {
-    case SWPCTRL:
-      if (!record->event.pressed) {
+    switch (keycode) {
+      case SWPCTRL:
         process_magic(QK_MAGIC_TOGGLE_CTL_GUI, record);
         process_magic(QK_MAGIC_UNSWAP_RCTL_RGUI, record);
-      }
-      return false;
-    default:
-      return true;
+        break;
+      case DELBIOS:
+        del_bios_token = defer_exec(1, del_bios_callback, NULL);
+        break;
+      default:
+        break;
+    }
   }
+  return true;
 };
