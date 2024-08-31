@@ -13,6 +13,7 @@
 
 enum custom_keycodes {
   SWPCTRL = SAFE_RANGE,
+  DELBIOS
 };
 
 
@@ -28,8 +29,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [_Function_Layer] = LAYOUT_75_ansi(
       DF(_Blank_Layer), _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______, _______,  _______,  KC_MUTE,  KC_MEDIA_PREV_TRACK, KC_MEDIA_PLAY_PAUSE, KC_MEDIA_NEXT_TRACK,
-      QK_DEBUG_TOGGLE,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,            QK_BOOTLOADER,
-      _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,            QK_REBOOT,
+      QK_DEBUG_TOGGLE,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  QK_REBOOT,            QK_BOOTLOADER,
+      _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,            DELBIOS,
       _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,            _______,            _______,
       _______,    _______,  _______,  _______,  _______,  _______,  _______,    _______,  _______,  _______,  _______,  _______,                 _______,   _______,
       SWPCTRL,  QK_MAGIC_TOGGLE_CTL_GUI,  _______,                                _______,                  _______,        _______,         _______,  _______,  _______,   _______
@@ -95,6 +96,12 @@ static uint32_t idle_callback(uint32_t trigger_time, void* cb_arg) {
   return 0;
 }
 
+uint32_t del_bios_callback(uint32_t trigger_time, void* cb_arg) {
+  // tap_code(KC_DEL);
+  SEND_STRING("DEL");
+  return 100;  // Call the callback every 16 ms.
+}
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   // On every key event, start or extend the deferred execution to call
   // `idle_callback()` after IDLE_TIMEOUT_MS.
@@ -104,13 +111,23 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     rgblight_wakeup();
   }
 
+  if (record->event.pressed) {
+    static deferred_token del_bios_token = INVALID_DEFERRED_TOKEN;
+    if (del_bios_token) {
+      cancel_deferred_exec(del_bios_token);
+      del_bios_token = INVALID_DEFERRED_TOKEN;
+    } else if (keycode == DELBIOS) {
+      del_bios_token = defer_exec(1, del_bios_callback, NULL);
+    }
+  }
+
   switch (keycode) {
     case SWPCTRL:
-      if (record->event.pressed) {
+      if (!record->event.pressed) {
         process_magic(QK_MAGIC_TOGGLE_CTL_GUI, record);
         process_magic(QK_MAGIC_UNSWAP_RCTL_RGUI, record);
       }
-      return true;
+      return false;
     default:
       return true;
   }
