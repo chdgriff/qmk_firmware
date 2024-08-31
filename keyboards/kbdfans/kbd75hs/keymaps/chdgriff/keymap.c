@@ -6,9 +6,8 @@
 #define _Mac_Function_Layer     2
 #define _Blank_Layer            3
 #define _Blank_Function_Layer   4
-#define RGB_DEFAULT_HUE         169
-#define RGB_DEFAULT_SAT         242
-#define RGB_DEFAULT_VAL         255
+#define HSV_DEFAULT             160,    242,    255 // H S V
+#define HSV_MY_YELLOW           22,     255,    220
 #define IDLE_TIMEOUT_MS         120000  // Idle timeout in milliseconds.
 
 enum custom_keycodes {
@@ -59,8 +58,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 
 const rgblight_segment_t PROGMEM capslock_light_layer[] = RGBLIGHT_LAYER_SEGMENTS(
-  {1, 3, HSV_RED},       // Light 4 LEDs, starting with LED 6
-  {6, 4, HSV_RED}       // Light 4 LEDs, starting with LED 12
+  {0, 5, HSV_MY_YELLOW}       // Light 5 LEDs, starting with LED 0
 );
 
 const rgblight_segment_t* const PROGMEM my_rgb_layers[] = RGBLIGHT_LAYERS_LIST(
@@ -70,7 +68,7 @@ const rgblight_segment_t* const PROGMEM my_rgb_layers[] = RGBLIGHT_LAYERS_LIST(
 void keyboard_post_init_user(void) {
   // Enable the LED layers
   rgblight_layers = my_rgb_layers;
-  rgblight_sethsv_noeeprom(RGBLIGHT_DEFAULT_HUE, RGBLIGHT_DEFAULT_SAT, RGBLIGHT_DEFAULT_VAL);
+  rgblight_sethsv_noeeprom(HSV_DEFAULT);
   rgblight_mode_noeeprom(RGBLIGHT_DEFAULT_MODE);
   rgblight_enable_noeeprom(); // enables Rgb, without saving settings
 }
@@ -80,12 +78,11 @@ bool led_update_user(led_t led_state) {
   return true;
 }
 layer_state_t default_layer_state_set_user(layer_state_t state) {
-  // rgblight_set_layer_state(1, layer_state_cmp(state, _Blank_Layer));
   if (layer_state_cmp(state, _Blank_Layer)) {
     rgblight_sethsv_noeeprom(HSV_RED);
   }
   else if (layer_state_cmp(state, _Base_Layer)){
-    rgblight_sethsv_noeeprom(RGBLIGHT_DEFAULT_HUE, RGBLIGHT_DEFAULT_SAT, RGBLIGHT_DEFAULT_VAL);
+    rgblight_sethsv_noeeprom(HSV_DEFAULT);
   }
   return state;
 }
@@ -115,7 +112,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (del_bios_token) {
       cancel_deferred_exec(del_bios_token);
       del_bios_token = INVALID_DEFERRED_TOKEN;
-      rgblight_sethsv_noeeprom(RGBLIGHT_DEFAULT_HUE, RGBLIGHT_DEFAULT_SAT, RGBLIGHT_DEFAULT_VAL);
+      rgblight_sethsv_noeeprom(HSV_DEFAULT);
       return true;
     }
 
