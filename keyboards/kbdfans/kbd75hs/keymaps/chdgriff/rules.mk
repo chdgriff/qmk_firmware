@@ -1,3 +1,4 @@
 LTO_ENABLE = yes
 MOUSEKEY_ENABLE = no
 DEBOUNCE_TYPE = sym_defer_pk
+DEFERRED_EXEC_ENABLE = yes

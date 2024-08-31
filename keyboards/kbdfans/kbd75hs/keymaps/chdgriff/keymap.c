@@ -9,6 +9,7 @@
 #define RGB_DEFAULT_HUE         169
 #define RGB_DEFAULT_SAT         242
 #define RGB_DEFAULT_VAL         255
+#define IDLE_TIMEOUT_MS         120000  // Idle timeout in milliseconds.
 
 enum custom_keycodes {
   SWPCTRL = SAFE_RANGE,
@@ -56,14 +57,38 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                           KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO)
 };
 
+static uint32_t idle_callback(uint32_t trigger_time, void* cb_arg) {
+  // If execution reaches here, the keyboard has gone idle.
+  rgblight_suspend();
+  return 0;
+}
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  // On every key event, start or extend the deferred execution to call
+  // `idle_callback()` after IDLE_TIMEOUT_MS.
+  static deferred_token idle_token = INVALID_DEFERRED_TOKEN;
+  if (!extend_deferred_exec(idle_token, IDLE_TIMEOUT_MS)) {
+    idle_token = defer_exec(IDLE_TIMEOUT_MS, idle_callback, NULL);
+    rgblight_wakeup();
+  }
+
   switch (keycode) {
     case SWPCTRL:
       if (record->event.pressed) {
         process_magic(QK_MAGIC_TOGGLE_CTL_GUI, record);
         process_magic(QK_MAGIC_UNSWAP_RCTL_RGUI, record);
       }
-      return false;
+      return true;
+    case RGBLIGHTSUSPEND:
+      if (record->event.pressed) {
+        rgblight_suspend();
+      }
+      return true;
+    case RGBLIGHTWAKEUP:
+      if (record->event.pressed) {
+        rgblight_wakeup();
+      }
+      return true;
     default:
       return true;
   }
@@ -81,8 +106,8 @@ const rgblight_segment_t* const PROGMEM my_rgb_layers[] = RGBLIGHT_LAYERS_LIST(
 void keyboard_post_init_user(void) {
   // Enable the LED layers
   rgblight_layers = my_rgb_layers;
-  rgblight_mode_noeeprom(RGBLIGHT_DEFAULT_MODE);
   rgblight_sethsv_noeeprom(RGBLIGHT_DEFAULT_HUE, RGBLIGHT_DEFAULT_SAT, RGBLIGHT_DEFAULT_VAL);
+  rgblight_mode_noeeprom(RGBLIGHT_DEFAULT_MODE);
   rgblight_enable_noeeprom(); // enables Rgb, without saving settings
 }
 
@@ -100,60 +125,3 @@ layer_state_t default_layer_state_set_user(layer_state_t state) {
   }
   return state;
 }
-
-// /* RGB Timeout behaves similar to OLED Timeout where it turns off underglow
-// lighting on your QMK board after X seconds of inactivity. The logic is
-// best described by this reddit comment - https://bit.ly/3zCYIRl
-// To begin, add the following variables and function definitions to your keymap.c file */
-
-// static uint16_t key_timer; // timer to track the last keyboard activity
-// static void refresh_rgb(void); // refreshes the activity timer and RGB, invoke whenever activity happens
-// static void check_rgb_timeout(void); // checks if enough time has passed for RGB to timeout
-// bool is_rgb_timeout = false; // store if RGB has timed out or not in a boolean
-
-
-// void refresh_rgb() {
-//   key_timer = timer_read(); // store time of last refresh
-//   if (is_rgb_timeout) { // only do something if rgb has timed out
-//     print("Activity detected, removing timeout\n");
-//     is_rgb_timeout = false;
-//     rgblight_wakeup();
-//   }
-// }
-
-// void check_rgb_timeout() {
-//   if (!is_rgb_timeout && timer_elapsed(key_timer) > RGBLIGHT_TIMEOUT) {
-//     rgblight_suspend();
-//     is_rgb_timeout = true;
-//   }
-// }
-
-
-// /* Then, call the above functions from QMK's built in post processing functions like so */
-
-// /* Runs at the end of each scan loop, check if RGB timeout has occured */
-// void housekeeping_task_user(void) {
-//   #ifdef RGBLIGHT_TIMEOUT
-//   check_rgb_timeout();
-//   #endif
-
-//   /* rest of the function code here */
-// }
-
-// /* Runs after each key press, check if activity occurred */
-// void post_process_record_user(uint16_t keycode, keyrecord_t *record) {
-//   #ifdef RGBLIGHT_TIMEOUT
-//   if (record->event.pressed) refresh_rgb();
-//   #endif
-
-//   /* rest of the function code here */
-// }
-
-// /* Runs after each encoder tick, check if activity occurred */
-// void post_encoder_update_user(uint8_t index, bool clockwise) {
-//   #ifdef RGBLIGHT_TIMEOUT
-//   refresh_rgb();
-//   #endif
-
-//   /* rest of the function code here */
-// }
