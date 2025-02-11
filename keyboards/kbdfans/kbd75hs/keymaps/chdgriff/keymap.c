@@ -9,10 +9,9 @@
 #define HSV_MY_YELLOW           22,     255,    220
 #define IDLE_TIMEOUT_MS         120000  // Idle timeout in milliseconds.
 
-enum custom_keycodes {
-    SWPCTRL = SAFE_RANGE,
-    // CUSTOM1, ...
-};
+// enum custom_keycodes {
+//     // CUSTOM1, ...
+// };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_Base_Layer] = LAYOUT_75_ansi(
@@ -24,12 +23,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_LCTL, KC_LGUI, KC_LALT, KC_SPC,                                    KC_RALT, MO(_Function_Layer), KC_RCTL, KC_LEFT, KC_DOWN, KC_RGHT
     ),
     [_Function_Layer] = LAYOUT_75_ansi(
-        DF(_Blank_Layer), _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_MUTE, KC_MEDIA_PREV_TRACK, KC_MEDIA_PLAY_PAUSE, KC_MEDIA_NEXT_TRACK,
-        QK_DEBUG_TOGGLE,  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, QK_REBOOT,                                QK_BOOTLOADER,
+        DF(_Blank_Layer), _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_MUTE, KC_MPRV, KC_MPLY, KC_MNXT,
+        DB_TOGG,  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, QK_RBT,                                QK_BOOT,
         _______,              _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,                              _______,
         _______,                  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,                                   _______,
         _______,                      _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,                   _______,             _______,
-        SWPCTRL, QK_MAGIC_TOGGLE_CTL_GUI, _______, _______,                                                _______, _______, _______, _______,             _______,             _______
+        CG_TOGG, GU_TOGG, _______, _______,                                                _______, _______, _______, _______,             _______,             _______
     ),
     [_Blank_Layer] = LAYOUT_75_ansi(
         KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
@@ -103,10 +102,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
     if (record->event.pressed) {
         switch (keycode) {
-        case SWPCTRL:
-            process_magic(QK_MAGIC_TOGGLE_CTL_GUI, record);
-            process_magic(QK_MAGIC_UNSWAP_RCTL_RGUI, record);
-            break;
+        // case CUSTOM1:
+        //     break;
         default:
             break;
         }
