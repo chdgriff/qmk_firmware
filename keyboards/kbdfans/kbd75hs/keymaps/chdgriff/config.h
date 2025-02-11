@@ -39,6 +39,4 @@
 #define RGBLIGHT_LAYERS
 #define RGBLIGHT_LAYERS_RETAIN_VAL
 
-#define LED_MATRIX_SLEEP    true
-#define RGB_MATRIX_SLEEP    true
 #define RGBLIGHT_SLEEP  // allows us to use rgblight_suspend() and rgblight_wakeup() in keymap.c
