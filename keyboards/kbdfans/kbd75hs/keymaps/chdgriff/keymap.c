@@ -5,12 +5,12 @@
 #define _Function_Layer         1
 #define _Blank_Layer            2
 #define _Blank_Function_Layer   3
-#define HSV_DEFAULT             160,    242,    255 // H S V
+#define HSV_MY_DEFAULT          160,    242,    255 // H S V
 #define HSV_MY_YELLOW           22,     255,    220
 #define IDLE_TIMEOUT_MS         120000  // Idle timeout in milliseconds.
 
 // enum custom_keycodes {
-//     // CUSTOM1, ...
+//     CUSTOM1 = SAFERANGE,
 // };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -23,7 +23,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_LCTL, KC_LGUI, KC_LALT, KC_SPC,                                    KC_RALT, MO(_Function_Layer), KC_RCTL, KC_LEFT, KC_DOWN, KC_RGHT
     ),
     [_Function_Layer] = LAYOUT_75_ansi(
-        DF(_Blank_Layer), _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_MUTE, KC_MPRV, KC_MPLY, KC_MNXT,
+        TG(_Blank_Layer), _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_MUTE, KC_MPRV, KC_MPLY, KC_MNXT,
         DB_TOGG,  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, QK_RBT,                                QK_BOOT,
         _______,              _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,                              _______,
         _______,                  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,                                   _______,
@@ -39,7 +39,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, MO(_Blank_Function_Layer), KC_NO, KC_NO, KC_NO, KC_NO
     ),
     [_Blank_Function_Layer] = LAYOUT_75_ansi(
-        DF(_Base_Layer), KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
+        TG(_Blank_Layer), KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
         KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
         KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
         KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
@@ -52,8 +52,13 @@ const rgblight_segment_t PROGMEM capslock_light_layer[] = RGBLIGHT_LAYER_SEGMENT
     {0, 5, HSV_MY_YELLOW}       // Light 5 LEDs, starting with LED 0
 );
 
+const rgblight_segment_t PROGMEM function_light_layer[] = RGBLIGHT_LAYER_SEGMENTS(
+    {14, 2, HSV_WHITE}       // Light 5 LEDs, starting with LED 0
+);
+
 const rgblight_segment_t* const PROGMEM my_rgb_layers[] = RGBLIGHT_LAYERS_LIST(
-    capslock_light_layer
+    capslock_light_layer,
+    function_light_layer
 );
 
 bool led_update_user(led_t led_state) {
@@ -61,12 +66,23 @@ bool led_update_user(led_t led_state) {
     return true;
 }
 
-layer_state_t default_layer_state_set_user(layer_state_t state) {
+// layer_state_t default_layer_state_set_user(layer_state_t state) {
+//     if (layer_state_cmp(state, _Blank_Layer)) {
+//         rgblight_sethsv_noeeprom(HSV_RED);
+//     }
+//     else {
+//         rgblight_sethsv_noeeprom(HSV_MY_DEFAULT);
+//     }
+//     return state;
+// }
+
+layer_state_t layer_state_set_user(layer_state_t state) {
+    rgblight_set_layer_state(1, (layer_state_cmp(state, _Function_Layer) || layer_state_cmp(state, _Blank_Function_Layer)));
     if (layer_state_cmp(state, _Blank_Layer)) {
         rgblight_sethsv_noeeprom(HSV_RED);
     }
-    else if (layer_state_cmp(state, _Base_Layer)){
-        rgblight_sethsv_noeeprom(HSV_DEFAULT);
+    else {
+        rgblight_sethsv_noeeprom(HSV_MY_DEFAULT);
     }
     return state;
 }
@@ -89,7 +105,7 @@ static void idle_wake(void) {
 void keyboard_post_init_user(void) {
     // Enable the LED layers
     rgblight_layers = my_rgb_layers;
-    rgblight_sethsv_noeeprom(HSV_DEFAULT);
+    rgblight_sethsv_noeeprom(HSV_MY_DEFAULT);
     rgblight_mode_noeeprom(RGBLIGHT_DEFAULT_MODE);
     rgblight_enable_noeeprom(); // enables Rgb, without saving settings
 
@@ -97,16 +113,17 @@ void keyboard_post_init_user(void) {
 }
 
 // Before keycode event is processed:
-bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    idle_wake();
+// bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+//     idle_wake();
 
-    if (record->event.pressed) {
-        switch (keycode) {
-        // case CUSTOM1:
-        //     break;
-        default:
-            break;
-        }
-    }
-    return true;
-}
+//     if (record->event.pressed) {
+//         switch (keycode) {
+//         case TOGGLE_BLANK:
+//             switch_default_layer(_Blank_Layer, _Blank_Function_Layer)
+//             break;
+//         default:
+//             break;
+//         }
+//     }
+//     return true;
+// }
