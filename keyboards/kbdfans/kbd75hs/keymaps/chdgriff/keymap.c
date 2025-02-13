@@ -9,9 +9,10 @@
 #define HSV_MY_YELLOW           22,     255,    220
 #define IDLE_TIMEOUT_MS         120000  // Idle timeout in milliseconds.
 
-// enum custom_keycodes {
-//     CUSTOM1 = SAFERANGE,
-// };
+enum custom_keycodes {
+    LOCK = SAFE_RANGE,
+    UNLOCK,
+};
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_Base_Layer] = LAYOUT_75_ansi(
@@ -23,7 +24,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_LCTL, KC_LGUI, KC_LALT, KC_SPC,                                    KC_RALT, MO(_Function_Layer), KC_RCTL, KC_LEFT, KC_DOWN, KC_RGHT
     ),
     [_Blank_Layer] = LAYOUT_75_ansi(
-        KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
+        KC_Q, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
         KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
         KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
         KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
@@ -31,7 +32,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, MO(_Blank_Function_Layer), KC_NO, KC_NO, KC_NO, KC_NO
     ),
     [_Function_Layer] = LAYOUT_75_ansi(
-        TG(_Blank_Layer), _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_MUTE, KC_MPRV, KC_MPLY, KC_MNXT,
+        LOCK, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_MUTE, KC_MPRV, KC_MPLY, KC_MNXT,
         DB_TOGG,  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, QK_RBT,                                QK_BOOT,
         _______,              _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,                              _______,
         _______,                  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,                                   _______,
@@ -39,7 +40,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         CG_TOGG, GU_TOGG, _______, _______,                                                _______, _______, _______, _______,             _______,             _______
     ),
     [_Blank_Function_Layer] = LAYOUT_75_ansi(
-        TG(_Blank_Layer), _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+        UNLOCK, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
@@ -66,24 +67,7 @@ bool led_update_user(led_t led_state) {
     return true;
 }
 
-// layer_state_t default_layer_state_set_user(layer_state_t state) {
-//     if (layer_state_cmp(state, _Blank_Layer)) {
-//         rgblight_sethsv_noeeprom(HSV_RED);
-//     }
-//     else {
-//         rgblight_sethsv_noeeprom(HSV_MY_DEFAULT);
-//     }
-//     return state;
-// }
-
 layer_state_t layer_state_set_user(layer_state_t state) {
-    if (layer_state_cmp(state, _Blank_Layer)) {
-        rgblight_sethsv_noeeprom(HSV_RED);
-    }
-    else {
-        rgblight_sethsv_noeeprom(HSV_MY_DEFAULT);
-    }
-    
     rgblight_set_layer_state(1, (layer_state_cmp(state, _Function_Layer) || layer_state_cmp(state, _Blank_Function_Layer)));
     return state;
 }
@@ -117,14 +101,19 @@ void keyboard_post_init_user(void) {
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     idle_wake();
 
-    // if (record->event.pressed) {
-    //     switch (keycode) {
-    //     case TOGGLE_BLANK:
-    //         switch_default_layer(_Blank_Layer, _Blank_Function_Layer)
-    //         break;
-    //     default:
-    //         break;
-    //     }
-    // }
+    if (record->event.pressed) {
+        switch (keycode) {
+            case LOCK:
+                layer_off(_Blank_Layer);
+                rgblight_sethsv_noeeprom(HSV_RED);
+                break;
+            case UNLOCK:
+                layer_on(_Blank_Layer);
+                rgblight_sethsv_noeeprom(HSV_MY_DEFAULT);
+                break;
+        default:
+            break;
+        }
+    }
     return true;
 }
