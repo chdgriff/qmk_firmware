@@ -2,8 +2,8 @@
 #include "process_magic.h"
 
 #define _Base_Layer             0
-#define _Function_Layer         1
-#define _Blank_Layer            2
+#define _Blank_Layer            1
+#define _Function_Layer         2
 #define _Blank_Function_Layer   3
 #define HSV_MY_DEFAULT          160,    242,    255 // H S V
 #define HSV_MY_YELLOW           22,     255,    220
@@ -22,14 +22,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_LSFT,        KC_Z,    KC_X,  KC_C,  KC_V,  KC_B,  KC_N,  KC_M,  KC_COMM,  KC_DOT,    KC_SLSH,      KC_RSFT,        KC_UP,   KC_PGDN,
         KC_LCTL, KC_LGUI, KC_LALT, KC_SPC,                                    KC_RALT, MO(_Function_Layer), KC_RCTL, KC_LEFT, KC_DOWN, KC_RGHT
     ),
-    [_Function_Layer] = LAYOUT_75_ansi(
-        DF(_Blank_Layer), _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_MUTE, KC_MPRV, KC_MPLY, KC_MNXT,
-        DB_TOGG,  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, QK_RBT,                                QK_BOOT,
-        _______,              _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,                              _______,
-        _______,                  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,                                   _______,
-        _______,                      _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,                   _______,             _______,
-        CG_TOGG, GU_TOGG, _______, _______,                                                _______, _______, _______, _______,             _______,             _______
-    ),
     [_Blank_Layer] = LAYOUT_75_ansi(
         KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
         KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
@@ -38,13 +30,21 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
         KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, MO(_Blank_Function_Layer), KC_NO, KC_NO, KC_NO, KC_NO
     ),
+    [_Function_Layer] = LAYOUT_75_ansi(
+        TG(_Blank_Layer), _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_MUTE, KC_MPRV, KC_MPLY, KC_MNXT,
+        DB_TOGG,  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, QK_RBT,                                QK_BOOT,
+        _______,              _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,                              _______,
+        _______,                  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,                                   _______,
+        _______,                      _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,                   _______,             _______,
+        CG_TOGG, GU_TOGG, _______, _______,                                                _______, _______, _______, _______,             _______,             _______
+    ),
     [_Blank_Function_Layer] = LAYOUT_75_ansi(
-        DF(_Base_Layer), KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
-        KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
-        KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
-        KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
-        KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
-        KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO
+        TG(_Blank_Layer), _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
     )
 };
 
@@ -66,17 +66,24 @@ bool led_update_user(led_t led_state) {
     return true;
 }
 
-layer_state_t default_layer_state_set_user(layer_state_t state) {
+// layer_state_t default_layer_state_set_user(layer_state_t state) {
+//     if (layer_state_cmp(state, _Blank_Layer)) {
+//         rgblight_sethsv_noeeprom(HSV_RED);
+//     }
+//     else {
+//         rgblight_sethsv_noeeprom(HSV_MY_DEFAULT);
+//     }
+//     return state;
+// }
+
+layer_state_t layer_state_set_user(layer_state_t state) {
     if (layer_state_cmp(state, _Blank_Layer)) {
         rgblight_sethsv_noeeprom(HSV_RED);
     }
     else {
         rgblight_sethsv_noeeprom(HSV_MY_DEFAULT);
     }
-    return state;
-}
-
-layer_state_t layer_state_set_user(layer_state_t state) {
+    
     rgblight_set_layer_state(1, (layer_state_cmp(state, _Function_Layer) || layer_state_cmp(state, _Blank_Function_Layer)));
     return state;
 }
