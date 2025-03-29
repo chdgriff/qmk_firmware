@@ -21,7 +21,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_TAB,     KC_Q,    KC_W,  KC_E,  KC_R,  KC_T,  KC_Y,  KC_U,  KC_I,     KC_O,     KC_P,       KC_LBRC, KC_RBRC, KC_BSLS,      KC_DEL,
         KC_CAPS,      KC_A,    KC_S,  KC_D,  KC_F,  KC_G,  KC_H,  KC_J,  KC_K,     KC_L,     KC_SCLN,     KC_QUOT, KC_ENT,             KC_PGUP,
         KC_LSFT,        KC_Z,    KC_X,  KC_C,  KC_V,  KC_B,  KC_N,  KC_M,  KC_COMM,  KC_DOT,    KC_SLSH,      KC_RSFT,        KC_UP,   KC_PGDN,
-        KC_LCTL, KC_LGUI, KC_LALT, KC_SPC,                                    KC_RALT, MO(_Function_Layer), KC_RCTL, KC_LEFT, KC_DOWN, KC_RGHT
+        KC_LCTL, KC_LALT, KC_LGUI, KC_SPC,                                    MO(_Function_Layer), KC_RALT,  KC_RCTL, KC_LEFT, KC_DOWN, KC_RGHT
     ),
     [_Blank_Layer] = LAYOUT_75_ansi(
         KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
@@ -37,7 +37,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______,              _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,                              _______,
         _______,                  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,                                   _______,
         _______,                      _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,                   _______,             _______,
-        CG_TOGG, GU_TOGG, _______, _______,                                                _______, _______, _______, _______,             _______,             _______
+        CG_TOGG, _______, GU_TOGG, _______,                                                _______, _______, _______, _______,             _______,             _______
     ),
     [_Blank_Function_Layer] = LAYOUT_75_ansi(
         UNLOCK, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
@@ -54,7 +54,7 @@ const rgblight_segment_t PROGMEM capslock_light_layer[] = RGBLIGHT_LAYER_SEGMENT
 );
 
 const rgblight_segment_t PROGMEM function_light_layer[] = RGBLIGHT_LAYER_SEGMENTS(
-    {14, 2, HSV_WHITE}       // Light 2 LEDs, starting with LED 14
+    {15, 2, HSV_WHITE}       // Light 2 LEDs, starting with LED 14
 );
 
 const rgblight_segment_t* const PROGMEM my_rgb_layers[] = RGBLIGHT_LAYERS_LIST(
